@@ -1,10 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import os
 import json
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 
+# ✅ Tell Flask where your static files are
 app = Flask(__name__, static_folder='static')
 
 @app.route('/api/logVideoUrl', methods=['POST'])
@@ -16,7 +17,7 @@ def log_video_url():
         return jsonify({"error": "Missing YouTube URL"}), 400
 
     try:
-        # Load Google service account credentials
+        # ✅ Load Google service account credentials from env
         creds_dict = json.loads(os.environ['GOOGLE_KEY_JSON'])
         creds = ServiceAccountCredentials.from_json_keyfile_dict(
             creds_dict, ['https://www.googleapis.com/auth/spreadsheets']
@@ -24,7 +25,7 @@ def log_video_url():
         client = gspread.authorize(creds)
         sheet = client.open("AIHUB_QuizData_Master").worksheet("quiz_submission")
 
-        # Log timestamp + URL
+        # ✅ Log timestamp + URL
         sheet.append_row([datetime.now().isoformat(), video_url], value_input_option='USER_ENTERED')
 
         return jsonify({"message": "Logged successfully!"})
@@ -32,8 +33,10 @@ def log_video_url():
         print("Error logging to Google Sheets:", e)
         return jsonify({"error": str(e)}), 500
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+# ✅ Serve the HTML form from static directory
 @app.route('/')
 def index():
-    return app.send_static_file('youtube_input.html')
+    return send_from_directory('static', 'youtube_input.html')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
