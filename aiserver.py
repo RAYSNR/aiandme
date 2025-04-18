@@ -10,7 +10,8 @@ app = Flask(__name__)
 @app.route('/')
 @app.route('/youtube_input.html')
 def serve_youtube_input():
-    return send_file('youtube_input.html')
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'youtube_input.html')
+    return send_file(file_path)
 
 @app.route('/api/logVideoUrl', methods=['POST'])
 def log_video_url():
