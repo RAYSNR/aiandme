@@ -5,11 +5,11 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 
-app = Flask(__name__, static_folder='static')
+app = Flask(__name__, static_folder='.', static_url_path='')
 
 @app.route('/')
-def home():
-    return send_from_directory('static', 'youtube_input.html')
+def serve_index():
+    return send_from_directory('.', 'youtube_input.html')
 
 @app.route('/api/logVideoUrl', methods=['POST'])
 def log_video_url():
@@ -20,14 +20,18 @@ def log_video_url():
         return jsonify({"error": "Missing YouTube URL"}), 400
 
     try:
+        # Load Google service account credentials
         creds_dict = json.loads(os.environ['GOOGLE_KEY_JSON'])
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(
+        creds = ServiceAccountCredentials.from_json_keydict(
             creds_dict,
             ['https://www.googleapis.com/auth/spreadsheets']
         )
         client = gspread.authorize(creds)
         sheet = client.open("AIHUB_QuizData_Master").worksheet("quiz_submission")
+
+        # Log timestamp + URL
         sheet.append_row([datetime.now().isoformat(), video_url], value_input_option='USER_ENTERED')
+
         return jsonify({"message": "Logged successfully!"})
     except Exception as e:
         print("Error logging to Google Sheets:", e)
