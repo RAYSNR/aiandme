@@ -1,17 +1,20 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_from_directory
 import os
 import json
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 
-app = Flask(__name__)
+# Mount public folder manually
+app = Flask(__name__, static_folder='public', static_url_path='/')
 
 @app.route('/')
+def serve_home():
+    return send_from_directory('public', 'youtube_input.html')
+
 @app.route('/youtube_input.html')
-def serve_youtube_input():
-    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'youtube_input.html')
-    return send_file(file_path)
+def serve_youtube():
+    return send_from_directory('public', 'youtube_input.html')
 
 @app.route('/api/logVideoUrl', methods=['POST'])
 def log_video_url():
