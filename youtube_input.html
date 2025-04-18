@@ -54,16 +54,33 @@
   </div>
 
   <script>
-    function submitUrl() {
-      const url = document.getElementById('youtubeUrl').value;
+    async function submitUrl() {
+      const url = document.getElementById('youtubeUrl').value.trim();
+
       if (!url) {
         alert("Please enter a YouTube URL.");
         return;
       }
-      // ✅ This is where you'd connect to server.py or another handler
-      console.log("Submitted:", url);
-      // You can redirect or POST the URL here
-      // window.location.href = `quizmaster.html?video=${encodeURIComponent(url)}`;
+
+      try {
+        const response = await fetch("http://127.0.0.1:8080/api/logVideoUrl", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ youtube_url: url })
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          alert("✅ URL logged to Google Sheet!");
+        } else {
+          alert("❌ Server error: " + result.error);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("❌ Network error. Is the backend running?");
+      }
     }
   </script>
 </body>
