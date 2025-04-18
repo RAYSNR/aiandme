@@ -1,1 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YouTube Quiz Input</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      color: #00ffe1;
+    }
+    input, button {
+      padding: 12px;
+      margin: 8px 0;
+      width: 300px;
+      border: none;
+      border-radius: 6px;
+    }
+    input {
+      background-color: #222;
+      color: #fff;
+    }
+    button {
+      background-color: #00ffe1;
+      color: #000;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #00ccbe;
+    }
+    .message {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Submit YouTube Video URL</h1>
+  <input type="text" id="youtube_url" placeholder="Paste YouTube link here" />
+  <button onclick="submitURL()">Generate Quiz</button>
+  <div class="message" id="response"></div>
+
+  <script>
+    async function submitURL() {
+      const url = document.getElementById("youtube_url").value;
+      const responseDiv = document.getElementById("response");
+
+      if (!url.trim()) {
+        responseDiv.innerText = "Please enter a valid YouTube URL.";
+        return;
+      }
+
+      responseDiv.innerText = "Submitting...";
+
+      try {
+        const response = await fetch("/api/logVideoUrl", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ youtube_url: url })
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          responseDiv.innerText = "✅ Success! Your video URL was logged.";
+        } else {
+          responseDiv.innerText = "❌ Error: " + result.error;
+        }
+      } catch (err) {
+        responseDiv.innerText = "❌ Network error or server not responding.";
+      }
+    }
+  </script>
+</body>
+</html>
 
