@@ -3,3 +3,4 @@ openai
 requests
 youtube-transcript-api
 gspread
+oauth2client
