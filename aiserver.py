@@ -1,19 +1,16 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_file
 import os
 import json
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 
-app = Flask(__name__, static_folder='.', static_url_path='')
+app = Flask(__name__)
 
 @app.route('/')
-def index():
-    return send_from_directory('.', 'youtube_input.html')
-
 @app.route('/youtube_input.html')
 def serve_youtube_input():
-    return send_from_directory('.', 'youtube_input.html')
+    return send_file('youtube_input.html')
 
 @app.route('/api/logVideoUrl', methods=['POST'])
 def log_video_url():
